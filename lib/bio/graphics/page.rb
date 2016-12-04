@@ -23,6 +23,7 @@ module Bio
         @tracks = [] #array of track objects with loads of features in it...
         @nt_per_percent = 1;
         @num_intervals = args[:number_of_intervals]
+        @size_intervals = args[:size_of_intervals]
         @track_top = 30
 
         def @svg.update_height(height)
@@ -220,25 +221,20 @@ module Bio
 
       #Calculates the Page scale-start and scale-stop position and the nucleotides per pixel for the current Page
       def get_limits
-        @tracks.each do |track|
-          lowest = track.features.sort { |x, y| x.start <=> y.start }.first.start
-          highest = track.features.sort { |x, y| y.end <=> x.end }.first.end
-          @scale_start = lowest if lowest < @scale_start
-          @scale_stop = highest if highest > @scale_stop
+        track = @tracks.first
+        lowest = track.features.sort { |x, y| x.start <=> y.start }.first.start
+        highest = track.features.sort { |x, y| y.end <=> x.end }.first.end
+        @scale_start = lowest if lowest < @scale_start
+        @scale_stop = highest if highest > @scale_stop
+        @nt_per_px_x = (@scale_stop - @scale_start).to_f / @width.to_f
+
+        highest = track.features.map { |feat|
+          compute_boundaries(feat)[1]
+        }.max
+        if highest > @scale_stop
+          @scale_stop = highest
           @nt_per_px_x = (@scale_stop - @scale_start).to_f / @width.to_f
         end
-        begin
-          old_nt_per_px_x = @nt_per_px_x
-          @tracks.each do |track|
-            highest = track.features.map { |feat|
-              compute_boundaries(feat)[1]
-            }.max
-            if highest > @scale_stop
-              @scale_stop = highest
-              @nt_per_px_x = (@scale_stop - @scale_start).to_f / @width.to_f
-            end
-          end
-        end while (@nt_per_px_x - old_nt_per_px_x).abs > 1
       end
 
       def compute_boundaries(feature)
@@ -252,9 +248,10 @@ module Bio
       def draw_scale
         Glyph.scale(:start => @scale_start,
                     :stop => @scale_stop,
-                    :number_of_intervals => @num_intervals, :page_width => @width).each { |g| @svg.add_primitive(g) }
+                    :number_of_intervals => @num_intervals, :size_of_intervals => @size_intervals,
+                    :page_height => @height, :page_width => @width).each { |g| @svg.add_primitive(g) }
       end
-      
+
       #Adds the Bio::Graphics::Primitive objects to the SVGEE object
       #* +args+ - an Array of Bio::Graphics::Primitive object
       def draw_label(args)
@@ -262,7 +259,7 @@ module Bio
                     :x => args[:x],
                     :y => args[:y]).each { |g| @svg.add_primitive(g) }
       end
-      
+
 
       def draw_generic(args) #remember presentation info comes from track@args when the track is defined
         Glyph.generic(args).each { |g| @svg.add_primitive(g) }
@@ -271,7 +268,7 @@ module Bio
       def draw_directed(args)
         Glyph.directed(args).each { |g| @svg.add_primitive(g) }
       end
- 
+
       def draw_circle(args)
         Glyph.circle(args).each { |g| @svg.add_primitive(g) }
       end
@@ -390,9 +387,10 @@ module Bio
 
         @height = @track_top + 100 #fudge...
         @svg.update_height(@height)
-                               #@svg.update_width(@width + 200)
+        #@svg.update_width(@width + 200)
 
       end
+
       #Calculates the pixel value for a given number
       def to_px(num)
         (num.to_f / @nt_per_px_x.to_f)
@@ -407,6 +405,7 @@ module Bio
         end
         @svg.draw
       end
+
       #Prints the svg text to STDOUT
       def draw
         puts get_markup
