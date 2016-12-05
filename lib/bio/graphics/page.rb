@@ -375,11 +375,13 @@ module Bio
                                               :utrs => f.utrs,
                                               :block_gaps => f.block_gaps,
                                               :height => track.feature_height,
+                                              :link_val => f.link_val,
+                                              :fill_color => f.fill_color,
                                               :params => f.params
             }.merge!(track.args))
 
             if f.id
-              draw_label(:y => y, :x => x + width +2, :text => f.id)
+              draw_label(:y => y-2, :x => x, :text => f.id)
             end
           end
           @track_top += (track.feature_height * track.number_rows * 2) + 20

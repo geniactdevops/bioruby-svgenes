@@ -155,7 +155,7 @@ module Bio
             :fill_color => 'red',
             :stroke => "black",
             :stroke_width => 1,
-            :style => "fill-opacity:0.4;"}.merge!(args)
+            :style => "fill-opacity:1;"}.merge!(args)
 
         if args[:strand] == '-'
           args[:points] = "#{args[:x]},#{args[:y]} #{args[:x] + args[:width]},#{args[:y]} #{args[:x] + args[:width]},#{args[:y] + args[:height] } #{args[:x]},#{args[:y] + (args[:height])} #{args[:x] - (args[:height] * 0.2)},#{args[:y] + (args[:height]/2)}"
@@ -204,7 +204,7 @@ module Bio
             :fill_color => 'red',
             :stroke => "black",
             :stroke_width => 1,
-            :style => "fill-opacity:0.4;"}.merge!(args)
+            :style => "fill-opacity:1;"}.merge!(args)
 
         args[:points] = "#{args[:x]},#{args[:y]} #{args[:x] + args[:width]},#{args[:y]} #{ args[:x] + (args[:width]/2) },#{(args[:y] + args[:height]) }"
         [Bio::Graphics::Primitive.new(:polygon, args)]
@@ -248,7 +248,7 @@ module Bio
             :fill_color => 'red',
             :stroke => "black",
             :stroke_width => 1,
-            :style => "fill-opacity:0.4;"}.merge!(args)
+            :style => "fill-opacity:1;"}.merge!(args)
         args[:points] = "#{args[:x]},#{args[:y] + args[:height]} #{args[:x] + args[:width]},#{args[:y] + args[:height]} #{ args[:x] + (args[:width]/2) },#{args[:y] }"
         [Bio::Graphics::Primitive.new(:polygon, args)]
       end
